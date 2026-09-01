@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, LogOut, Menu, X } from 'lucide-react'
+import { Boxes, LayoutDashboard, LogOut, Menu, Package, Warehouse, X } from 'lucide-react'
 import { getStoredUser, logout as logoutRequest } from '../services/auth'
 
 // Navegação lateral, agrupada como num ERP de verdade: Cadastros (dados
@@ -20,6 +20,17 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   { title: null, items: [{ label: 'Painel', path: '/', icon: LayoutDashboard }] },
+  {
+    title: 'Cadastros',
+    items: [
+      { label: 'Produtos', path: '/produtos', icon: Package },
+      { label: 'Almoxarifados', path: '/almoxarifados', icon: Warehouse },
+    ],
+  },
+  {
+    title: 'Operação',
+    items: [{ label: 'Estoque', path: '/estoque', icon: Boxes }],
+  },
 ]
 
 const roleLabels: Record<string, string> = {

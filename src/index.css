@@ -24,3 +24,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Estilo padrão de input/select usado em todos os formulários do painel
+   (react-hook-form), pra não repetir a mesma pilha de classes Tailwind
+   em cada campo. */
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none;
+    @apply focus:border-amber-500 focus:ring-1 focus:ring-amber-500;
+  }
+}
