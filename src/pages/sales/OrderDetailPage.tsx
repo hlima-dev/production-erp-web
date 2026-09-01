@@ -10,13 +10,15 @@ import {
   useOrder,
   useStartOrderSeparation,
 } from '../../hooks/useOrders'
+import { useCreateInvoice, useInvoices } from '../../hooks/useInvoices'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TONES } from '../../types/sales'
 import { getErrorMessage } from '../../services/api'
 
-// Pedido é o "hub" que amarra os módulos visualmente: aqui aparecem, quando
-// existirem (módulos fiscal/logistics), o link da NF-e emitida e do
-// romaneio que expediu este pedido — por enquanto só as ações do próprio
-// módulo sales.
+// Pedido é o "hub" que amarra os módulos visualmente: além das ações do
+// próprio módulo sales, aqui aparece o botão de emitir NF-e (quando
+// EM_SEPARACAO) e o link pra nota já emitida (quando FATURADO em diante) —
+// e, quando o módulo logistics existir, o link do romaneio que expediu
+// este pedido.
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -28,6 +30,21 @@ export function OrderDetailPage() {
   const startSeparation = useStartOrderSeparation()
   const deliverOrder = useDeliverOrder()
   const cancelOrder = useCancelOrder()
+  const createInvoice = useCreateInvoice()
+  // Não há endpoint "nota fiscal por pedido" — busca a lista (já em cache
+  // na maior parte das navegações) e acha a nota deste pedido em memória.
+  const { data: invoices } = useInvoices()
+  const invoiceForOrder = invoices?.find((inv) => inv.orderId === order?.id)
+
+  async function handleIssueInvoice() {
+    setError(null)
+    try {
+      const invoice = await createInvoice.mutateAsync(order!.id)
+      navigate(`/notas-fiscais/${invoice.id}`)
+    } catch (err) {
+      setError(getErrorMessage(err))
+    }
+  }
 
   async function runAction(action: () => Promise<unknown>) {
     setError(null)
@@ -69,6 +86,15 @@ export function OrderDetailPage() {
         </div>
         <StatusBadge label={ORDER_STATUS_LABELS[order.status]} tone={ORDER_STATUS_TONES[order.status]} />
       </div>
+
+      {invoiceForOrder && (
+        <p className="mb-6 -mt-3 text-sm text-slate-500">
+          NF-e emitida:{' '}
+          <Link to={`/notas-fiscais/${invoiceForOrder.id}`} className="text-amber-700 hover:underline">
+            #{invoiceForOrder.invoiceNumber}
+          </Link>
+        </p>
+      )}
 
       {error && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
 
@@ -131,6 +157,16 @@ export function OrderDetailPage() {
             className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
           >
             Iniciar separação
+          </button>
+        )}
+        {order.status === 'EM_SEPARACAO' && (
+          <button
+            type="button"
+            onClick={handleIssueInvoice}
+            disabled={createInvoice.isPending}
+            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+          >
+            {createInvoice.isPending ? 'Emitindo...' : 'Emitir NF-e'}
           </button>
         )}
         {order.status === 'EXPEDIDO' && (

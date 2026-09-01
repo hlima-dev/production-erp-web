@@ -14,6 +14,8 @@ import { OrderDetailPage } from './pages/sales/OrderDetailPage'
 import { ProductionOrdersPage } from './pages/production/ProductionOrdersPage'
 import { ProductionOrderFormPage } from './pages/production/ProductionOrderFormPage'
 import { ProductionOrderDetailPage } from './pages/production/ProductionOrderDetailPage'
+import { InvoicesPage } from './pages/fiscal/InvoicesPage'
+import { InvoiceDetailPage } from './pages/fiscal/InvoiceDetailPage'
 
 export default function App() {
   return (
@@ -40,6 +42,8 @@ export default function App() {
         <Route path="/producao" element={<ProductionOrdersPage />} />
         <Route path="/producao/nova" element={<ProductionOrderFormPage />} />
         <Route path="/producao/:id" element={<ProductionOrderDetailPage />} />
+        <Route path="/notas-fiscais" element={<InvoicesPage />} />
+        <Route path="/notas-fiscais/:id" element={<InvoiceDetailPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
