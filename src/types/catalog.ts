@@ -1,4 +1,4 @@
-export type ProductType = 'MATERIA_PRIMA' | 'PRODUTO_ACABADO'
+export type ProductType = 'MATERIA_PRIMA' | 'SEMI_ACABADO' | 'PRODUTO_ACABADO'
 
 export type UnitOfMeasure = 'UN' | 'KG' | 'G' | 'L' | 'ML' | 'CX'
 
@@ -49,6 +49,7 @@ export interface BillOfMaterialInput {
 
 export const PRODUCT_TYPE_LABELS: Record<ProductType, string> = {
   MATERIA_PRIMA: 'Matéria-prima',
+  SEMI_ACABADO: 'Semi-acabado',
   PRODUTO_ACABADO: 'Produto acabado',
 }
 

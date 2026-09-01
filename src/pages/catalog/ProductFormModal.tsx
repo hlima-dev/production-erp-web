@@ -11,7 +11,7 @@ const schema = z.object({
   code: z.string().min(1, 'Código é obrigatório'),
   name: z.string().min(1, 'Nome é obrigatório'),
   unit: z.enum(['UN', 'KG', 'G', 'L', 'ML', 'CX'], { message: 'Unidade é obrigatória' }),
-  type: z.enum(['MATERIA_PRIMA', 'PRODUTO_ACABADO'], { message: 'Tipo é obrigatório' }),
+  type: z.enum(['MATERIA_PRIMA', 'SEMI_ACABADO', 'PRODUTO_ACABADO'], { message: 'Tipo é obrigatório' }),
   category: z.string().optional(),
   // z.literal('') PRECISA vir antes de z.coerce.number(): union tenta as
   // opções em ordem e para na primeira que passar, e z.coerce.number()

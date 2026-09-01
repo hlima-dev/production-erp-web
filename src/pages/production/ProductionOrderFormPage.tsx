@@ -7,6 +7,7 @@ import { useProducts } from '../../hooks/useProducts'
 import { useWarehouses } from '../../hooks/useWarehouses'
 import { useCreateProductionOrder } from '../../hooks/useProductionOrders'
 import { getErrorMessage, getFieldErrors } from '../../services/api'
+import { PRODUCT_TYPE_LABELS } from '../../types/catalog'
 
 const schema = z.object({
   productId: z.string().min(1, 'Selecione o produto'),
@@ -20,8 +21,12 @@ type FormValues = z.output<typeof schema>
 
 export function ProductionOrderFormPage() {
   const navigate = useNavigate()
-  // Só produtos acabados podem virar ordem de produção — mesma regra do backend.
-  const { data: products } = useProducts({ type: 'PRODUTO_ACABADO', includeInactive: false })
+  // Produto acabado ou semi-acabado podem virar ordem de produção — só
+  // matéria-prima não, mesma regra do backend (BOM em múltiplos níveis: um
+  // semi-acabado também é "produzido" a partir de uma ficha técnica própria,
+  // e depois vira insumo de outro produto).
+  const { data: allProducts } = useProducts({ includeInactive: false })
+  const products = allProducts?.filter((p) => p.type !== 'MATERIA_PRIMA')
   const { data: warehouses } = useWarehouses()
   const createOrder = useCreateProductionOrder()
 
@@ -62,18 +67,18 @@ export function ProductionOrderFormPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex max-w-lg flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6">
         <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Produto acabado</label>
+          <label className="mb-1 block text-sm font-medium text-slate-700">Produto (semi-acabado ou acabado)</label>
           <select className="input" {...register('productId')}>
             <option value="">Selecione o produto</option>
             {products?.map((product) => (
               <option key={product.id} value={product.id}>
-                {product.code} — {product.name}
+                {product.code} — {product.name} ({PRODUCT_TYPE_LABELS[product.type]})
               </option>
             ))}
           </select>
           {errors.productId && <p className="mt-1 text-xs text-red-600">{errors.productId.message}</p>}
           {products?.length === 0 && (
-            <p className="mt-1 text-xs text-slate-400">Nenhum produto acabado ativo cadastrado ainda.</p>
+            <p className="mt-1 text-xs text-slate-400">Nenhum produto semi-acabado ou acabado ativo cadastrado ainda.</p>
           )}
         </div>
 

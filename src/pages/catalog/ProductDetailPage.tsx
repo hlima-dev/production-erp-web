@@ -27,7 +27,9 @@ type FormValues = z.output<typeof schema>
 export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { data: product, isLoading } = useProduct(id)
-  const isFinishedGood = product?.type === 'PRODUTO_ACABADO'
+  // Semi-acabado também passa por ordem de produção própria e tem ficha
+  // técnica (BOM em múltiplos níveis) — só matéria-prima não tem.
+  const hasBillOfMaterial = product?.type === 'SEMI_ACABADO' || product?.type === 'PRODUTO_ACABADO'
 
   if (isLoading) return <p className="text-slate-500">Carregando...</p>
   if (!product) return <p className="text-slate-500">Produto não encontrado.</p>
@@ -55,11 +57,11 @@ export function ProductDetailPage() {
         </div>
       </div>
 
-      {isFinishedGood ? (
+      {hasBillOfMaterial ? (
         <BillOfMaterialEditor productId={product.id} />
       ) : (
         <p className="text-sm text-slate-500">
-          Ficha técnica só se aplica a produtos acabados — este é uma matéria-prima.
+          Ficha técnica só se aplica a produtos semi-acabados ou acabados — este é uma matéria-prima.
         </p>
       )}
     </div>
@@ -68,7 +70,13 @@ export function ProductDetailPage() {
 
 function BillOfMaterialEditor({ productId }: { productId: string }) {
   const { data: bom, isLoading } = useBillOfMaterial(productId)
-  const { data: ingredients } = useProducts({ type: 'MATERIA_PRIMA' })
+  // Insumo pode ser matéria-prima ou outro semi-acabado (BOM em múltiplos
+  // níveis) — produto acabado nunca entra como insumo, e um produto não
+  // pode ser insumo dele mesmo (o backend valida os dois casos de novo, e
+  // também dependência circular entre semi-acabados — aqui é só pra não
+  // nem oferecer a opção inválida no select).
+  const { data: allProducts } = useProducts({ includeInactive: false })
+  const ingredients = allProducts?.filter((p) => p.type !== 'PRODUTO_ACABADO' && p.id !== productId)
   const saveBom = useSaveBillOfMaterial(productId)
 
   const {
@@ -127,7 +135,7 @@ function BillOfMaterialEditor({ productId }: { productId: string }) {
                   <option value="">Selecione o insumo</option>
                   {ingredients?.map((ingredient) => (
                     <option key={ingredient.id} value={ingredient.id}>
-                      {ingredient.code} — {ingredient.name}
+                      {ingredient.code} — {ingredient.name} ({PRODUCT_TYPE_LABELS[ingredient.type]})
                     </option>
                   ))}
                 </select>
