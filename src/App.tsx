@@ -16,6 +16,11 @@ import { ProductionOrderFormPage } from './pages/production/ProductionOrderFormP
 import { ProductionOrderDetailPage } from './pages/production/ProductionOrderDetailPage'
 import { InvoicesPage } from './pages/fiscal/InvoicesPage'
 import { InvoiceDetailPage } from './pages/fiscal/InvoiceDetailPage'
+import { VehiclesPage } from './pages/logistics/VehiclesPage'
+import { DriversPage } from './pages/logistics/DriversPage'
+import { DeliveryManifestsPage } from './pages/logistics/DeliveryManifestsPage'
+import { DeliveryManifestFormPage } from './pages/logistics/DeliveryManifestFormPage'
+import { DeliveryManifestDetailPage } from './pages/logistics/DeliveryManifestDetailPage'
 
 export default function App() {
   return (
@@ -44,6 +49,11 @@ export default function App() {
         <Route path="/producao/:id" element={<ProductionOrderDetailPage />} />
         <Route path="/notas-fiscais" element={<InvoicesPage />} />
         <Route path="/notas-fiscais/:id" element={<InvoiceDetailPage />} />
+        <Route path="/veiculos" element={<VehiclesPage />} />
+        <Route path="/motoristas" element={<DriversPage />} />
+        <Route path="/romaneios" element={<DeliveryManifestsPage />} />
+        <Route path="/romaneios/novo" element={<DeliveryManifestFormPage />} />
+        <Route path="/romaneios/:id" element={<DeliveryManifestDetailPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

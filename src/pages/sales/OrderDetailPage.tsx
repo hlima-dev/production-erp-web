@@ -11,14 +11,15 @@ import {
   useStartOrderSeparation,
 } from '../../hooks/useOrders'
 import { useCreateInvoice, useInvoices } from '../../hooks/useInvoices'
+import { useDeliveryManifests } from '../../hooks/useDeliveryManifests'
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TONES } from '../../types/sales'
 import { getErrorMessage } from '../../services/api'
 
 // Pedido é o "hub" que amarra os módulos visualmente: além das ações do
-// próprio módulo sales, aqui aparece o botão de emitir NF-e (quando
-// EM_SEPARACAO) e o link pra nota já emitida (quando FATURADO em diante) —
-// e, quando o módulo logistics existir, o link do romaneio que expediu
-// este pedido.
+// próprio módulo sales, aqui aparecem o botão de emitir NF-e (quando
+// EM_SEPARACAO), o link pra nota já emitida (quando FATURADO em diante) e
+// o link do romaneio que expediu este pedido (quando EXPEDIDO/ENTREGUE) —
+// fechando visualmente o ciclo sales → fiscal → logistics.
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -31,10 +32,13 @@ export function OrderDetailPage() {
   const deliverOrder = useDeliverOrder()
   const cancelOrder = useCancelOrder()
   const createInvoice = useCreateInvoice()
-  // Não há endpoint "nota fiscal por pedido" — busca a lista (já em cache
-  // na maior parte das navegações) e acha a nota deste pedido em memória.
+  // Não há endpoint "nota fiscal por pedido" / "romaneio por pedido" —
+  // busca as listas (já em cache na maior parte das navegações) e acha o
+  // registro deste pedido em memória.
   const { data: invoices } = useInvoices()
   const invoiceForOrder = invoices?.find((inv) => inv.orderId === order?.id)
+  const { data: manifests } = useDeliveryManifests()
+  const manifestForOrder = manifests?.find((m) => m.orders.some((o) => o.orderId === order?.id))
 
   async function handleIssueInvoice() {
     setError(null)
@@ -87,12 +91,24 @@ export function OrderDetailPage() {
         <StatusBadge label={ORDER_STATUS_LABELS[order.status]} tone={ORDER_STATUS_TONES[order.status]} />
       </div>
 
-      {invoiceForOrder && (
-        <p className="mb-6 -mt-3 text-sm text-slate-500">
-          NF-e emitida:{' '}
-          <Link to={`/notas-fiscais/${invoiceForOrder.id}`} className="text-amber-700 hover:underline">
-            #{invoiceForOrder.invoiceNumber}
-          </Link>
+      {(invoiceForOrder || manifestForOrder) && (
+        <p className="mb-6 -mt-3 flex flex-wrap gap-x-4 text-sm text-slate-500">
+          {invoiceForOrder && (
+            <span>
+              NF-e emitida:{' '}
+              <Link to={`/notas-fiscais/${invoiceForOrder.id}`} className="text-amber-700 hover:underline">
+                #{invoiceForOrder.invoiceNumber}
+              </Link>
+            </span>
+          )}
+          {manifestForOrder && (
+            <span>
+              Romaneio:{' '}
+              <Link to={`/romaneios/${manifestForOrder.id}`} className="text-amber-700 hover:underline">
+                #{manifestForOrder.manifestNumber}
+              </Link>
+            </span>
+          )}
         </p>
       )}
 
