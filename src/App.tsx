@@ -11,6 +11,9 @@ import { CustomersPage } from './pages/sales/CustomersPage'
 import { OrdersPage } from './pages/sales/OrdersPage'
 import { OrderFormPage } from './pages/sales/OrderFormPage'
 import { OrderDetailPage } from './pages/sales/OrderDetailPage'
+import { ProductionOrdersPage } from './pages/production/ProductionOrdersPage'
+import { ProductionOrderFormPage } from './pages/production/ProductionOrderFormPage'
+import { ProductionOrderDetailPage } from './pages/production/ProductionOrderDetailPage'
 
 export default function App() {
   return (
@@ -34,6 +37,9 @@ export default function App() {
         <Route path="/pedidos/novo" element={<OrderFormPage />} />
         <Route path="/pedidos/:id" element={<OrderDetailPage />} />
         <Route path="/pedidos/:id/editar" element={<OrderFormPage />} />
+        <Route path="/producao" element={<ProductionOrdersPage />} />
+        <Route path="/producao/nova" element={<ProductionOrderFormPage />} />
+        <Route path="/producao/:id" element={<ProductionOrderDetailPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
