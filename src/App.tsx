@@ -7,6 +7,10 @@ import { ProductsPage } from './pages/catalog/ProductsPage'
 import { ProductDetailPage } from './pages/catalog/ProductDetailPage'
 import { WarehousesPage } from './pages/inventory/WarehousesPage'
 import { StockPage } from './pages/inventory/StockPage'
+import { CustomersPage } from './pages/sales/CustomersPage'
+import { OrdersPage } from './pages/sales/OrdersPage'
+import { OrderFormPage } from './pages/sales/OrderFormPage'
+import { OrderDetailPage } from './pages/sales/OrderDetailPage'
 
 export default function App() {
   return (
@@ -25,6 +29,11 @@ export default function App() {
         <Route path="/produtos/:id" element={<ProductDetailPage />} />
         <Route path="/almoxarifados" element={<WarehousesPage />} />
         <Route path="/estoque" element={<StockPage />} />
+        <Route path="/clientes" element={<CustomersPage />} />
+        <Route path="/pedidos" element={<OrdersPage />} />
+        <Route path="/pedidos/novo" element={<OrderFormPage />} />
+        <Route path="/pedidos/:id" element={<OrderDetailPage />} />
+        <Route path="/pedidos/:id/editar" element={<OrderFormPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
