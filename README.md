@@ -67,6 +67,23 @@ protegida dispara uma tentativa de renovação via `/auth/refresh` antes de
 redirecionar pro login, com dedupe de chamadas concorrentes — ver
 `src/services/api.ts`.
 
+## Deploy (Vercel)
+
+1. No [Vercel](https://vercel.com), **Add New** → **Project** → importe
+   este repositório. Ele detecta Vite automaticamente (`npm run build`,
+   saída em `dist/`) — não precisa mexer em build settings.
+2. Em **Environment Variables**, adicione `VITE_API_URL` com a URL do
+   backend já publicado no Render (ex: `https://erp-producao-api.onrender.com`,
+   sem barra no final).
+3. Deploy. `vercel.json` já inclui o rewrite pra SPA (todas as rotas caem
+   em `index.html` — sem ele, um refresh em `/pedidos/123` daria 404).
+4. Volte no Render e atualize `CORS_ALLOWED_ORIGINS` do backend com a URL
+   que a Vercel gerou — ver o README do
+   [`production-erp-api`](https://github.com/hlima-dev/production-erp-api).
+
+Trocar `VITE_API_URL` depois do deploy exige um **redeploy** (é uma env
+var de build, embutida no bundle estático — não lida em runtime).
+
 ## Módulos
 
 | Módulo | Telas |
