@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { DataTable, type DataTableColumn } from '../../components/DataTable'
 import { StatusBadge } from '../../components/StatusBadge'
@@ -8,8 +7,15 @@ import { ORDER_STATUS_LABELS, ORDER_STATUS_TONES } from '../../types/sales'
 import type { Order, OrderStatus } from '../../types/sales'
 
 export function OrdersPage() {
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('')
+  // Filtro sincronizado com a URL (?status=...) — permite link direto
+  // (ex: painel → "Faturados p/ expedir") já chegando filtrado.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const statusFilter = (searchParams.get('status') as OrderStatus | null) ?? ''
   const { data: orders, isLoading } = useOrders(statusFilter || undefined)
+
+  function handleStatusChange(value: OrderStatus | '') {
+    setSearchParams(value ? { status: value } : {})
+  }
 
   const columns: DataTableColumn<Order>[] = [
     {
@@ -41,7 +47,7 @@ export function OrdersPage() {
       </div>
 
       <div className="mb-4">
-        <select className="input w-auto" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as OrderStatus | '')}>
+        <select className="input w-auto" value={statusFilter} onChange={(e) => handleStatusChange(e.target.value as OrderStatus | '')}>
           <option value="">Todos os status</option>
           {Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
